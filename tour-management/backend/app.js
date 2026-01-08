@@ -14,28 +14,41 @@ const bookingRoute = require("./routes/bookings");
 
 const app = express();
 
-// ✅ CORS (local + production later)
-app.use(
-  cors({
-    origin: ["http://localhost:3000", "https://takemytrip.vercel.app"],
-    credentials: true,
-  })
-);
+/* ================= CORS CONFIG ================= */
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
 
+    if (origin === "http://localhost:3000") {
+      return callback(null, true);
+    }
+
+    if (origin.endsWith(".vercel.app")) {
+      return callback(null, true);
+    }
+
+    return callback(new Error("Not allowed by CORS"));
+  },
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+
+/* ================= MIDDLEWARE ================= */
 app.use(express.json());
 app.use(cookieParser());
 
-// DB
+/* ================= DATABASE ================= */
 connectToDb();
 
-// Routes
+/* ================= ROUTES ================= */
 app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/tours", tourRoute);
 app.use("/api/v1/users", userRoute);
 app.use("/api/v1/review", reviewRoute);
 app.use("/api/v1/booking", bookingRoute);
 
-// Test route
+/* ================= TEST ================= */
 app.get("/", (req, res) => {
   res.send("API is working ✅");
 });
