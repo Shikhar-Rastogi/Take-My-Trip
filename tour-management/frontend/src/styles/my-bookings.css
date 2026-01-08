@@ -1,0 +1,41 @@
+.my-bookings {
+  margin: 60px auto;
+}
+
+/* booking card */
+.booking-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 18px;
+  margin-bottom: 20px;
+  box-shadow: rgba(0, 0, 0, 0.08) 0px 8px 24px;
+}
+
+/* status badge */
+.status {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  background: #e6f4ea;
+  color: #1e7e34;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+/* cancel button alignment */
+.booking-card .btn-outline-danger {
+  padding: 4px 10px;
+  font-size: 0.75rem;
+}
+
+/* spacing between status & button */
+.booking-card .d-flex {
+  gap: 12px;
+}
+
+/* optional hover */
+.booking-card:hover {
+  transform: translateY(-2px);
+  transition: 0.2s ease-in-out;
+}

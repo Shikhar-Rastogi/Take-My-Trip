@@ -1,0 +1,10 @@
+.profile__card {
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 8px 24px;
+}
+
+.profile__card h3 {
+  font-weight: 600;
+}

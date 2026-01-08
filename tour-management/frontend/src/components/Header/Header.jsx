@@ -3,21 +3,12 @@ import { Container, Row, Button } from "reactstrap";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/images/logo.png";
 import "./header.css";
-import { AuthContext } from "./../../context/AuthContext";
+import { AuthContext } from "../../context/AuthContext";
 
 const nav__links = [
-  {
-    path: "/home",
-    display: "Home",
-  },
-  {
-    path: "/about",
-    display: "About",
-  },
-  {
-    path: "/tours",
-    display: "Tours",
-  },
+  { path: "/home", display: "Home" },
+  { path: "/about", display: "About" },
+  { path: "/tours", display: "Tours" },
 ];
 
 const Header = () => {
@@ -28,11 +19,11 @@ const Header = () => {
 
   const logout = () => {
     dispatch({ type: "LOGOUT" });
-    navigate("/");
+    navigate("/home");
   };
 
-  const stickyHeaderFunc = () => {
-    window.addEventListener("scroll", () => {
+  useEffect(() => {
+    const stickyHeaderFunc = () => {
       if (
         document.body.scrollTop > 80 ||
         document.documentElement.scrollTop > 80
@@ -41,41 +32,35 @@ const Header = () => {
       } else {
         headerRef.current.classList.remove("sticky__header");
       }
-    });
-  };
+    };
 
-  useEffect(() => {
-    stickyHeaderFunc();
+    window.addEventListener("scroll", stickyHeaderFunc);
+    return () => window.removeEventListener("scroll", stickyHeaderFunc);
+  }, []);
 
-    return window.removeEventListener("scroll", stickyHeaderFunc);
-  });
-
-
-  const toggleMenu = ()=> menuRef.current.classList.toggle('show__menu')
+  const toggleMenu = () => menuRef.current.classList.toggle("show__menu");
 
   return (
     <header className="header" ref={headerRef}>
       <Container>
         <Row>
-          <div
-            className="nav_wrapper d-flex align-items-center
-        justify-content-between"
-          >
-            {/*========logo start========*/}
+          <div className="nav_wrapper d-flex align-items-center justify-content-between">
+            {/* ===== LOGO ===== */}
             <div className="logo">
-              <img src={logo} alt="" />
+              <Link to="/home">
+                <img src={logo} alt="logo" />
+              </Link>
             </div>
-            {/*========logo end========*/}
 
-            {/*========menu start========*/}
+            {/* ===== NAVIGATION ===== */}
             <div className="navigation" ref={menuRef} onClick={toggleMenu}>
               <ul className="menu d-flex align-items-center gap-5">
                 {nav__links.map((item, index) => (
                   <li className="nav__item" key={index}>
                     <NavLink
                       to={item.path}
-                      className={(navClass) =>
-                        navClass.isActive ? "active__link" : ""
+                      className={({ isActive }) =>
+                        isActive ? "active__link" : ""
                       }
                     >
                       {item.display}
@@ -84,13 +69,33 @@ const Header = () => {
                 ))}
               </ul>
             </div>
-            {/*========menu end========*/}
 
-            <div className="nav__right d-flex align-items-center gap-4 ">
-              <div className="nav__btns d-flex align-items-center gap-4 ">
+            {/* ===== RIGHT ACTIONS ===== */}
+            <div className="nav__right d-flex align-items-center gap-4">
+              <div className="nav__btns d-flex align-items-center gap-3">
                 {user ? (
                   <>
-                    <h5 className="mb-0">{user.username}</h5>
+                    {/* My Bookings FIRST */}
+                    <NavLink
+                      to="/my-bookings"
+                      className={({ isActive }) =>
+                        isActive ? "nav__item active__link" : "nav__item"
+                      }
+                    >
+                      My Bookings
+                    </NavLink>
+
+                    {/* Username AFTER My Bookings */}
+                    <NavLink
+                      to="/profile"
+                      className={({ isActive }) =>
+                        isActive ? "nav__item active__link" : "nav__item"
+                      }
+                    >
+                      {user.username}
+                    </NavLink>
+
+                    {/* Logout LAST */}
                     <Button className="btn btn-dark" onClick={logout}>
                       Logout
                     </Button>
@@ -106,8 +111,10 @@ const Header = () => {
                   </>
                 )}
               </div>
+
+              {/* ===== MOBILE MENU ICON ===== */}
               <span className="mobile__menu" onClick={toggleMenu}>
-                <i class="ri-menu-line"></i>
+                <i className="ri-menu-line"></i>
               </span>
             </div>
           </div>

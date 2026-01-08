@@ -52,7 +52,7 @@ const SearchBar = () => {
           </FormGroup>
           <FormGroup className="d-flex gap-3 form__group form__group-fast">
             <span>
-              <i class="ri-map-pin-time-line"></i>
+              <i className="ri-map-pin-time-line"></i>
             </span>
             <div>
               <h6>Distance</h6>

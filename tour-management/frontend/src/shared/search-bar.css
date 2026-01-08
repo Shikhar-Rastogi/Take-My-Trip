@@ -45,7 +45,7 @@
         border-radius: 2rem;
     }
 
-    .search__bar from {
+    .search__bar form {
         flex-wrap: wrap;
     }
 

@@ -1,9 +1,26 @@
-.thank__you span i{
-    font-size: 4rem;
-    color: green;
+.thank__you {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
+/* success icon */
+.thank__you span i {
+    font-size: 4rem;
+    color: green;
+    margin-bottom: 1rem;   
+}
+
+/* main heading */
 .thank__you h1 {
     font-size: 3.6rem;
     font-family: var(--subtitle-font-name);
+    margin-bottom: 0.5rem;
+}
+
+/* sub text */
+.thank__you h3 {
+    color: #6c757d;
+    margin-bottom: 2rem;  
 }
