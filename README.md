@@ -18,8 +18,7 @@
 ### 👨‍💻 Frontend:
 - **HTML5**, **CSS3**, **JavaScript**
 - **React.js** 
-- **Bootstrap** / TailwindCSS **
-
+- **Bootstrap** 
 ### 🔙 Backend:
 - **Node.js** with **Express.js**
 - **MongoDB** 
