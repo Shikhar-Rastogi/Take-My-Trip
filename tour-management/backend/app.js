@@ -17,13 +17,14 @@ const reviewRoute = require("./routes/reviews");
 const bookingRoute = require("./routes/bookings");
 
 const app = express();
+const allowedOrigins = ["http://localhost:3000"];
 
 /* ================= CORS CONFIG ================= */
 const corsOptions = {
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
 
-    if (origin === "http://localhost:3000") {
+    if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
 
@@ -42,6 +43,28 @@ app.use(helmet());
 /* ================= MIDDLEWARE ================= */
 app.use(express.json());
 app.use(cookieParser());
+app.use((req, res, next) => {
+  if (["GET", "HEAD", "OPTIONS"].includes(req.method)) {
+    return next();
+  }
+
+  const requestOrigin = req.get("origin");
+  const requestSite = req.get("sec-fetch-site");
+  const sameSiteRequest = !requestSite || requestSite === "same-origin";
+  const allowedCrossSite =
+    requestOrigin &&
+    (allowedOrigins.includes(requestOrigin) ||
+      requestOrigin.endsWith(".vercel.app"));
+
+  if (sameSiteRequest || allowedCrossSite) {
+    return next();
+  }
+
+  return res.status(403).json({
+    success: false,
+    message: "Blocked by CSRF protection",
+  });
+});
 app.use(
   "/api",
   rateLimit({
