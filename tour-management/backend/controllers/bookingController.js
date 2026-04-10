@@ -1,5 +1,6 @@
 const Booking = require("../models/Booking.js");
 const Tour = require("../models/Tour.js");
+const mongoose = require("mongoose");
 const { deleteCacheByPattern } = require("../utils/cache");
 
 /* ================= CREATE BOOKING ================= */
@@ -14,6 +15,13 @@ const createBooking = async (req, res) => {
     }
 
     const tourId = req.body.tourId;
+    if (!mongoose.Types.ObjectId.isValid(tourId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid tour id",
+      });
+    }
+
     const selectedTour = await Tour.findById(tourId);
     if (!selectedTour) {
       return res.status(404).json({
@@ -100,17 +108,12 @@ const cancelBooking = async (req, res) => {
 
     await Booking.findByIdAndDelete(req.params.id);
 
-    const updatedTour = await Tour.findByIdAndUpdate(
-      booking.tourId,
-      [
-        {
-          $set: {
-            bookedSeats: {
-              $max: [0, { $subtract: ["$bookedSeats", booking.guestSize] }],
-            },
-          },
-        },
-      ],
+    const updatedTour = await Tour.findOneAndUpdate(
+      {
+        _id: booking.tourId,
+        bookedSeats: { $gte: booking.guestSize },
+      },
+      { $inc: { bookedSeats: -booking.guestSize } },
       { new: true }
     );
 

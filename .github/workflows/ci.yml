@@ -5,6 +5,9 @@ on:
     branches: ["main", "copilot/**"]
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   frontend-checks:
     runs-on: ubuntu-latest

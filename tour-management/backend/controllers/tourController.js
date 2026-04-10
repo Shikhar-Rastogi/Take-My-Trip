@@ -11,6 +11,9 @@ const toNumber = (value, fallback = 0) => {
   return Number.isFinite(parsed) ? parsed : fallback;
 };
 
+const escapeRegex = (input = "") =>
+  input.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 const haversineDistanceKm = (lat1, lon1, lat2, lon2) => {
   const toRad = (deg) => (deg * Math.PI) / 180;
   const earthRadius = 6371;
@@ -153,7 +156,7 @@ const getAllTour = async (req, res) => {
 
 const getTourBySearch = async (req, res) => {
   const cityQuery = req.query.city || "";
-  const city = new RegExp(cityQuery, "i");
+  const city = new RegExp(escapeRegex(cityQuery), "i");
   const distance = parseInt(req.query.distance || "0");
   const maxGroupSize = parseInt(req.query.maxGroupSize || "0");
   const cacheKey = `tour:search:city:${cityQuery}:distance:${distance}:group:${maxGroupSize}`;
