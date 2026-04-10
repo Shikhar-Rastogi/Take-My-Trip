@@ -35,6 +35,19 @@ const tourSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    bookedSeats: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    coordinates: {
+      lat: {
+        type: Number,
+      },
+      lng: {
+        type: Number,
+      },
+    },
 
     reviews: [
       {

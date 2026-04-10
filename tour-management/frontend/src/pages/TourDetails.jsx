@@ -9,17 +9,22 @@ import Newsletter from "./../shared/Newsletter";
 import useFetch from "./../hooks/useFetch";
 import BASE_URL from "./../utils/config";
 import { AuthContext } from "./../context/AuthContext";
+import { io } from "socket.io-client";
+import TourCard from "../shared/TourCard";
 
 const TourDetails = () => {
   const { id } = useParams();
   const reviewMsgRef = useRef("");
   const [tourRating, setTourRating] = useState(null);
   const { user } = useContext(AuthContext);
+  const [availability, setAvailability] = useState(null);
+  const [recommendations, setRecommendations] = useState([]);
 
   //fetch data from database
   const { data: tour, loading, error } = useFetch(`${BASE_URL}/tours/${id}`);
 
   const {
+    _id,
     photo,
     title,
     desc,
@@ -29,11 +34,19 @@ const TourDetails = () => {
     city,
     distance,
     maxGroupSize,
+    coordinates,
   } = tour;
 
   const { totalRating, avgRating } = calculateAvgRating(reviews);
 
   const options = { day: "numeric", month: "long", year: "numeric" };
+  const hasCoordinates =
+    coordinates &&
+    typeof coordinates.lat === "number" &&
+    typeof coordinates.lng === "number";
+  const mapQuery = hasCoordinates
+    ? `${coordinates.lat},${coordinates.lng}`
+    : `${address}, ${city}`;
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -71,6 +84,64 @@ const TourDetails = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [tour]);
+
+  useEffect(() => {
+    if (!id) return;
+
+    const fetchAvailability = async () => {
+      try {
+        const res = await fetch(`${BASE_URL}/tours/${id}/availability`);
+        const result = await res.json();
+        if (res.ok) setAvailability(result.data);
+      } catch (error) {
+        console.error("Availability fetch failed");
+      }
+    };
+
+    fetchAvailability();
+  }, [id]);
+
+  useEffect(() => {
+    if (!_id || !user) return;
+
+    const fetchRecommendations = async () => {
+      try {
+        const res = await fetch(
+          `${BASE_URL}/tours/search/recommendations?currentTourId=${_id}`,
+          {
+            credentials: "include",
+          }
+        );
+        const result = await res.json();
+        if (res.ok) setRecommendations(result.data || []);
+      } catch (error) {
+        console.error("Recommendations fetch failed");
+      }
+    };
+
+    fetchRecommendations();
+  }, [_id, user]);
+
+  useEffect(() => {
+    const socketBaseUrl = BASE_URL.replace("/api/v1", "");
+    const socket = io(socketBaseUrl, {
+      withCredentials: true,
+      transports: ["websocket", "polling"],
+    });
+
+    socket.on("tour:availabilityUpdated", (payload) => {
+      if (payload?.tourId === id) {
+        setAvailability({
+          tourId: payload.tourId,
+          remainingSeats: payload.remainingSeats,
+          bookedSeats: payload.bookedSeats,
+          maxGroupSize,
+        });
+      }
+    });
+
+    return () => socket.disconnect();
+  }, [id, maxGroupSize]);
 
   return (
     <>
@@ -122,6 +193,23 @@ const TourDetails = () => {
                     </div>
                     <h5>Description</h5>
                     <p>{desc}</p>
+                    <h5 className="mt-4">Location Preview</h5>
+                    <iframe
+                      title="Tour Location"
+                      width="100%"
+                      height="320"
+                      style={{ border: 0, borderRadius: "12px" }}
+                      loading="lazy"
+                      allowFullScreen
+                      src={`https://maps.google.com/maps?q=${encodeURIComponent(
+                        mapQuery
+                      )}&z=12&output=embed`}
+                    />
+                    {availability && (
+                      <p className="mt-3 fw-semibold text-danger">
+                        Live seats left: {availability.remainingSeats}
+                      </p>
+                    )}
                   </div>
                   {/* tour reviews section start */}
                   <div className="tour__reviews mt-4">
@@ -194,12 +282,26 @@ const TourDetails = () => {
                 </div>
               </Col>
               <Col lg="4">
-                <Booking tour={tour} avgRating={avgRating} />
+                <Booking tour={tour} avgRating={avgRating} availability={availability} />
               </Col>
             </Row>
           )}
         </Container>
       </section>
+      {recommendations.length > 0 && (
+        <section className="pt-0">
+          <Container>
+            <h4 className="mb-4">Recommended for you</h4>
+            <Row>
+              {recommendations.map((recommendedTour) => (
+                <Col lg="3" md="6" sm="6" className="mb-4" key={recommendedTour._id}>
+                  <TourCard tour={recommendedTour} />
+                </Col>
+              ))}
+            </Row>
+          </Container>
+        </section>
+      )}
       <Newsletter />
     </>
   );

@@ -5,8 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import BASE_URL from "../../utils/config";
 
-const Booking = ({ tour, avgRating }) => {
-  const { price, reviews, title } = tour;
+const Booking = ({ tour, avgRating, availability }) => {
+  const { _id, price, reviews, title, city, address, coordinates } = tour;
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
 
@@ -14,6 +14,12 @@ const Booking = ({ tour, avgRating }) => {
     userId: user && user._id,
     userEmail: user && user.email,
     tourName: title,
+    tourId: _id,
+    destination: {
+      city,
+      address,
+      coordinates,
+    },
     fullName: "",
     phone: "",
     guestSize: 1,
@@ -54,7 +60,17 @@ const Booking = ({ tour, avgRating }) => {
         return alert(result.message);
       }
 
-      navigate("/thank-you");
+      navigate("/thank-you", {
+        state: {
+          booking: result.data,
+          tour: {
+            title,
+            city,
+            address,
+            coordinates,
+          },
+        },
+      });
     } catch (err) {
       alert("Something went wrong. Please try again later.");
       console.error("Booking Error:", err);
@@ -72,6 +88,11 @@ const Booking = ({ tour, avgRating }) => {
           ({reviews?.length})
         </span>
       </div>
+      {availability?.remainingSeats >= 0 && (
+        <p className="mb-2 text-danger fw-semibold">
+          Only {availability.remainingSeats} seat(s) left
+        </p>
+      )}
 
       <div className="booking__form">
         <h5>Information</h5>

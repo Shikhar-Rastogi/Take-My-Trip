@@ -33,6 +33,31 @@ const SearchBar = () => {
     );
   };
 
+  const nearMeHandler = async () => {
+    if (!navigator.geolocation) {
+      return alert("Geolocation is not supported in your browser");
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+          const res = await fetch(
+            `${BASE_URL}/tours/search/getNearbyTours?lat=${latitude}&lng=${longitude}&radiusKm=100`
+          );
+          const result = await res.json();
+          if (!res.ok) {
+            return alert(result.message || "Failed to fetch nearby tours");
+          }
+          navigate(`/tours/search?nearby=true`, { state: result.data });
+        } catch (error) {
+          alert("Failed to fetch nearby tours");
+        }
+      },
+      () => alert("Unable to access your location")
+    );
+  };
+
   return (
     <Col lg="12">
       <div className="search__bar">
@@ -75,6 +100,13 @@ const SearchBar = () => {
           <span className="search__icon" type="submit" onClick={searchHandler}>
             <i class="ri-search-line"></i>
           </span>
+          <button
+            type="button"
+            className="btn btn-warning text-white ms-2"
+            onClick={nearMeHandler}
+          >
+            Near Me
+          </button>
         </Form>
       </div>
     </Col>

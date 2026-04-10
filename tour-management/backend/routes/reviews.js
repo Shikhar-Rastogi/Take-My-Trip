@@ -1,9 +1,9 @@
 const express = require('express');
 const { createReview } = require('../controllers/reviewController.js');
-const {verifyUser}=require("../utils/verifyToken.js")
+const { verifyToken } = require("../utils/verifyToken.js")
 const router = express.Router();
 
-router.post('/:tourId',verifyUser,createReview)
+router.post('/:tourId', verifyToken, createReview)
 
 module.exports = router; 
  

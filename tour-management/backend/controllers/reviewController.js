@@ -1,5 +1,6 @@
 const Tour = require("../models/Tour.js");
 const Review = require("../models/Review.js");
+const { deleteCacheByPattern } = require("../utils/cache");
 
 const createReview = async (req, res) => {
   const tourId = req.params.tourId;
@@ -12,6 +13,9 @@ const createReview = async (req, res) => {
     await Tour.findByIdAndUpdate(tourId, {
       $push: { reviews: savedReview._id },
     });
+
+    await deleteCacheByPattern("tour:*");
+    await deleteCacheByPattern("recommendations:*");
 
     res
       .status(200)

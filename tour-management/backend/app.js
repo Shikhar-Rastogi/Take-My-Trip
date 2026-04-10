@@ -4,7 +4,11 @@ dotenv.config();
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
+const swaggerUi = require("swagger-ui-express");
 const connectToDb = require("./db/db");
+const openApiSpec = require("./docs/openapi");
 
 const tourRoute = require("./routes/tours");
 const userRoute = require("./routes/users");
@@ -33,10 +37,21 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+app.use(helmet());
 
 /* ================= MIDDLEWARE ================= */
 app.use(express.json());
 app.use(cookieParser());
+app.use(
+  "/api",
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 250,
+    standardHeaders: true,
+    legacyHeaders: false,
+  })
+);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(openApiSpec));
 
 /* ================= DATABASE ================= */
 connectToDb();

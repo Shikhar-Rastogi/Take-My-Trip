@@ -1,0 +1,37 @@
+const { getRedisClient } = require("./redisClient");
+
+const getCache = async (key) => {
+  const client = getRedisClient();
+  if (!client) return null;
+
+  await client.connect().catch(() => null);
+  const value = await client.get(key);
+
+  if (!value) return null;
+  return JSON.parse(value);
+};
+
+const setCache = async (key, value, ttlSeconds = 120) => {
+  const client = getRedisClient();
+  if (!client) return;
+
+  await client.connect().catch(() => null);
+  await client.set(key, JSON.stringify(value), "EX", ttlSeconds);
+};
+
+const deleteCacheByPattern = async (pattern) => {
+  const client = getRedisClient();
+  if (!client) return;
+
+  await client.connect().catch(() => null);
+  const keys = await client.keys(pattern);
+  if (keys.length > 0) {
+    await client.del(keys);
+  }
+};
+
+module.exports = {
+  getCache,
+  setCache,
+  deleteCacheByPattern,
+};

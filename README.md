@@ -1,46 +1,68 @@
 # 🌍 Take My Trip – Travel Planner Web Application
 
-**Take My Trip** is a web-based travel planning platform designed to help users explore destinations, discover travel packages based on budget and location, and manage their trips seamlessly. With secure authentication, real-time data retrieval via API, and user-centric booking features, the app offers a smooth and intuitive travel planning experience.
+**Take My Trip** is a travel planning platform where users can discover destinations, book tours, and manage trips in one place.
 
 ---
 
 ## 🚀 Features
 
-- 🌐 **Explore Destinations** – Browse various travel destinations with detailed descriptions and visuals.
-- 🔒 **User Authentication** – Secure login/register system to store user data and booking history.
-- 📅 **Trip Management** – Users can book their planned trips.
-- 🔄 **Backend API Integration** – Fetch real-time destination and package data, and handle bookings via efficient API calls.
+- 🌐 Explore destination tours with details and reviews
+- 🔒 JWT-based login/register authentication
+- 📅 Tour booking and booking management
+- 🗺️ Google Maps preview on Tour Details and booking confirmation
+- 📍 “Near Me” geolocation-based nearby tour search
+- ⚡ Redis caching for high-traffic tour APIs
+- 📡 Socket.IO live seat availability updates
+- 🎯 Personalized recommendations from booking history
+- 🛡️ Security hardening with Helmet + rate limiting
+- 📘 Swagger API docs at `/api-docs`
+- 🤖 GitHub Actions frontend CI (test + build)
 
 ---
 
 ## 🛠 Tech Stack
 
-### 👨‍💻 Frontend:
-- **HTML5**, **CSS3**, **JavaScript**
-- **React.js** 
-- **Bootstrap** 
-### 🔙 Backend:
-- **Node.js** with **Express.js**
-- **MongoDB** 
+### Frontend
+- React.js
+- Bootstrap / Reactstrap
 
-### 📡 API:
-- RESTful API to handle destination retrieval and booking operations
-
-### 🔐 Authentication:
-- **JWT** / Sessions
+### Backend
+- Node.js + Express.js
+- MongoDB (Mongoose)
+- Redis (optional, for caching)
+- Socket.IO
 
 ---
 
-## 📁 Folder Structure (Optional)
+## ⚙️ Environment Variables (Backend)
+
+- `MONGO_URI` - MongoDB connection string
+- `JWT_SECRET_KEY` - JWT signing secret
+- `PORT` - backend port (optional, defaults to 8000)
+- `REDIS_URL` - Redis connection URL (optional but recommended)
+
+---
+
+## 🧪 Run Locally
+
+### Backend
 ```bash
-take-my-trip/
-├── Frontend/               # Frontend files
-│   ├── public/
-│   └── src/
-├── Backend/               # Backend logic and API
-│   ├── controllers/
-│   ├── models/
-│   └── routes/
-├── .gitignore
-├── README.md
-└── package.json
+cd /home/runner/work/Take-My-Trip/Take-My-Trip/tour-management/backend
+npm ci
+npm run dev
+```
+
+### Frontend
+```bash
+cd /home/runner/work/Take-My-Trip/Take-My-Trip/tour-management/frontend
+npm ci
+npm start
+```
+
+---
+
+## 📚 API Docs
+
+When backend is running, open:
+
+`http://localhost:4000/api-docs`

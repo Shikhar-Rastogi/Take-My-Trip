@@ -7,7 +7,7 @@ import Newsletter from "./../shared/Newsletter";
 
 const SearchResultList = () => {
   const location = useLocation();
-  const [data] = useState(location.state);
+  const [data] = useState(location.state || []);
   return (
     <>
       <CommonSection title={"Tour Search Result"} />
